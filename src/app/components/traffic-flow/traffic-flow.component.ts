@@ -15,25 +15,23 @@ interface Point {
   };
 }
 
+interface RoadData {
+  [key: string]: number[];
+}
+
 @Component({
   selector: 'app-traffic-flow',
   template: '<div id="trafficFlowChart"></div>'
 })
 export class TrafficFlowComponent implements OnInit {
-  @Input() data: any;
+  @Input() data: RoadData = {};
 
   ngOnInit() {
     this.initChart();
   }
 
   private initChart() {
-    // 模擬數據
-    const mockData = {
-      '台74-松竹': [30, 25, 20, 15, 10, 8, 12, 18, 22, 28, 35, 40],
-      '台74-中清': [45, 42, 38, 35, 32, 30, 28, 25, 22, 20, 18, 15],
-      '台74-潭子': [50, 48, 45, 42, 40, 38, 35, 32, 30, 28, 25, 22]
-    };
-
+    // 使用輸入的數據
     const timeLabels = [
       '165分鐘前', '150分鐘前', '135分鐘前', '120分鐘前',
       '105分鐘前', '90分鐘前', '75分鐘前', '60分鐘前',
@@ -62,7 +60,7 @@ export class TrafficFlowComponent implements OnInit {
         }
       },
       yAxis: {
-        categories: ['台74-松竹', '台74-中清', '台74-潭子'],
+        categories: Object.keys(this.data),
         title: {
           text: null
         },
@@ -102,8 +100,8 @@ export class TrafficFlowComponent implements OnInit {
       series: [{
         name: '車速',
         borderWidth: 1,
-        data: Object.entries(mockData).flatMap((road, y) => 
-          road[1].map((value, x) => [x, y, value])
+        data: Object.entries(this.data).flatMap(([_, values]: [string, number[]]) => 
+          values.map((value: number, x: number) => [x, Object.keys(this.data).indexOf(_), value])
         ),
         dataLabels: {
           enabled: true,

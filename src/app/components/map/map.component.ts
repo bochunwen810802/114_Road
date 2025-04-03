@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, AfterViewInit, OnDestroy } from '@angular/core';
 import * as L from 'leaflet';
-import { TrafficDataService } from '../../services/traffic-data.service';
 
 @Component({
   selector: 'app-map',
@@ -8,20 +7,20 @@ import { TrafficDataService } from '../../services/traffic-data.service';
   styleUrls: ['./map.component.scss']
 })
 export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() affectedArea: any;
+  @Input() incidentLocation: [number, number] = [0, 0];
+  @Input() affectedArea: [number, number][] = [];
+  @Input() roadInfo: any = {};
+  
   private map!: L.Map;
-  private affectedAreaLayer!: L.GeoJSON;
+  private affectedAreaLayer!: L.Polygon;
   private roadLines: { [key: string]: L.Polyline } = {};
   
   // 时间轴相关
-  public timePoints: string[] = [];
+  public timePoints: string[] = ['即時車速', '10分鐘前', '20分鐘前', '30分鐘前'];
   public currentTimeIndex: number = 0;
   public currentTimeLabel: string = '即時車速';
   public isPlaying: boolean = false;
   private playInterval: any;
-  
-  // 道路数据
-  private roadData: any = {};
   
   private accidentIcon = L.divIcon({
     className: 'custom-accident-icon',
@@ -54,26 +53,16 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     popupAnchor: [0, -20]
   });
 
-  constructor(private trafficDataService: TrafficDataService) { }
+  constructor() { }
 
   ngOnInit(): void {
-    // 获取时间点数据
-    this.trafficDataService.getTimePoints().subscribe(timePoints => {
-      this.timePoints = timePoints;
-      this.currentTimeLabel = timePoints[0];
-      // 自動開始播放
-      this.isPlaying = true;
-      this.playInterval = setInterval(() => {
-        this.currentTimeIndex = (this.currentTimeIndex + 1) % this.timePoints.length;
-        this.drawRoads(this.currentTimeIndex);
-        this.updateTimeLabel();
-      }, 1500); // 每1.5秒切換一次
-    });
-    
-    // 获取道路数据
-    this.trafficDataService.getRoadData().subscribe(roadData => {
-      this.roadData = roadData;
-    });
+    // 自動開始播放
+    this.isPlaying = true;
+    this.playInterval = setInterval(() => {
+      this.currentTimeIndex = (this.currentTimeIndex + 1) % this.timePoints.length;
+      this.drawRoads(this.currentTimeIndex);
+      this.updateTimeLabel();
+    }, 1500); // 每1.5秒切換一次
   }
 
   ngAfterViewInit(): void {
@@ -91,47 +80,38 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private initMap(): void {
-    // 获取事故地点坐标
-    this.trafficDataService.getAccidentLocation().subscribe(location => {
-      // 计算地图中心点
-      const avgLat = location[0];
-      const avgLng = location[1];
-      
-      // 初始化地图
-      this.map = L.map('map').setView([avgLat, avgLng] as L.LatLngTuple, 15);
-      
-      // 使用浅色地图样式
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 19
+    // 初始化地图
+    this.map = L.map('map').setView([this.incidentLocation[0], this.incidentLocation[1]] as L.LatLngTuple, 15);
+    
+    // 使用浅色地图样式
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(this.map);
+    
+    // 添加事故地点标记
+    L.marker([this.incidentLocation[0], this.incidentLocation[1]] as L.LatLngTuple, { icon: this.accidentIcon })
+      .bindPopup('事故地點')
+      .addTo(this.map);
+    
+    // 添加影响范围图层
+    if (this.affectedArea && this.affectedArea.length > 0) {
+      this.affectedAreaLayer = L.polygon(this.affectedArea, {
+        color: '#ffd700',      // 黄色边框
+        weight: 2,             // 边框宽度
+        opacity: 0.8,          // 边框透明度
+        fillColor: '#ffd700',  // 黄色填充
+        fillOpacity: 0.3,      // 填充透明度
+        dashArray: '5, 10'     // 虚线边框
       }).addTo(this.map);
-      
-      // 添加事故地点标记
-      L.marker([avgLat, avgLng] as L.LatLngTuple, { icon: this.accidentIcon })
-        .bindPopup('事故地點')
-        .addTo(this.map);
-      
-      // 添加影响范围图层
-      this.trafficDataService.getAffectedAreaGeoJSON().subscribe(affectedArea => {
-        this.affectedAreaLayer = L.geoJSON(affectedArea, {
-          style: {
-            color: '#ffd700',      // 黄色边框
-            weight: 2,             // 边框宽度
-            opacity: 0.8,          // 边框透明度
-            fillColor: '#ffd700',  // 黄色填充
-            fillOpacity: 0.3,      // 填充透明度
-            dashArray: '5, 10'     // 虚线边框
-          }
-        }).addTo(this.map);
-      });
-      
-      // 创建图例
-      this.createLegend();
-      
-      // 绘制道路
-      this.drawRoads(this.currentTimeIndex);
-    });
+    }
+    
+    // 创建图例
+    this.createLegend();
+    
+    // 绘制道路
+    this.drawRoads(this.currentTimeIndex);
   }
   
   // 根据车速返回颜色
@@ -151,12 +131,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     
     // 绘制新的线条
-    for (let road in this.roadData) {
-      const roadInfo = this.roadData[road];
-      const speed = roadInfo.speed[timeIndex];
+    for (let road in this.roadInfo) {
+      const roadInfo = this.roadInfo[road];
+      const speed = roadInfo.speed[this.timePoints[timeIndex]];
       const color = this.getColor(speed);
       
-      const line = L.polyline(roadInfo.path, {
+      const line = L.polyline(roadInfo.coordinates, {
         color: color,
         weight: 8,
         opacity: 0.9
