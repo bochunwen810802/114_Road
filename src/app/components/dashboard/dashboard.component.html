@@ -1,0 +1,242 @@
+<div class="dashboard-container">
+  <!-- 頂部狀態列 -->
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="fas fa-calendar-alt"></i>
+      <div class="time-info">
+        <div class="time-label">事故發生時間</div>
+        <div class="time-value">{{currentIncident?.timestamp | date:'yyyy-MM-dd HH:mm:ss'}}</div>
+      </div>
+    </div>
+    <div class="status-item">
+      <i class="fas fa-clock"></i>
+      <div class="time-info">
+        <div class="time-label">報告產生時間</div>
+        <div class="time-value">{{currentTime | date:'yyyy-MM-dd HH:mm:ss'}}</div>
+      </div>
+    </div>
+    <div class="status-item">
+      <i class="fas fa-map-marker-alt"></i>
+      <span>台74線 松竹路段（24.1818, 120.722）</span>
+    </div>
+    <div class="status-item severity-display">
+      <div class="severity-label">事故等級</div>
+      <div class="severity-value" [ngClass]="'level-' + currentIncident?.severityLevel">
+        <ng-container [ngSwitch]="currentIncident?.severityLevel">
+          <ng-container *ngSwitchCase="1">
+            <i class="fas fa-exclamation"></i>
+            <span>輕微</span>
+          </ng-container>
+          <ng-container *ngSwitchCase="2">
+            <i class="fas fa-exclamation"></i>
+            <i class="fas fa-exclamation"></i>
+            <span>中等</span>
+          </ng-container>
+          <ng-container *ngSwitchCase="3">
+            <i class="fas fa-exclamation"></i>
+            <i class="fas fa-exclamation"></i>
+            <i class="fas fa-exclamation"></i>
+            <span>嚴重</span>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主要內容區域 -->
+  <div class="main-content">
+    <!-- 狀態面板列 -->
+    <div class="status-panels">
+      <div class="status-panel">
+        <div class="panel-header">
+          <div class="panel-title">疑似傷亡人數</div>
+          <div class="data-source-switch">
+            <input type="checkbox" id="dataSourceToggle">
+            <label class="slider" for="dataSourceToggle"></label>
+            <div class="labels" data-on="已驗證" data-off="民眾通報(未驗證)"></div>
+          </div>
+        </div>
+        <div class="panel-content">
+          <div class="casualty-item">
+            <span class="label">受傷</span>
+            <span class="value">{{injuredCount}}</span>
+            <span class="unit">人</span>
+          </div>
+          <div class="casualty-item">
+            <span class="label">死亡</span>
+            <span class="value">{{deathCount}}</span>
+            <span class="unit">人</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-panel">
+        <div class="panel-title">通報時間</div>
+        <div class="panel-content">
+          <span class="value">{{currentIncident?.timestamp | date:'HH:mm'}}</span>
+        </div>
+      </div>
+
+      <div class="status-panel">
+        <div class="panel-title">目前車速</div>
+        <div class="panel-content">
+          <span class="value">45</span>
+          <span class="unit">km/h</span>
+        </div>
+      </div>
+
+      <div class="status-panel highlight">
+        <div class="panel-title">預計緩解時間</div>
+        <div class="panel-content">
+          <span class="value">14</span>
+          <span class="unit">分鐘後</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 內容區域 -->
+    <div class="content-area">
+      <!-- 左側面板 -->
+      <div class="left-panel">
+        <!-- 事故周圍監視器區塊 -->
+        <div class="nearby-cctv-section">
+          <h3 class="main-title">事故周圍監視器</h3>
+          <div class="cctv-container">
+            <div class="cctv-grid">
+              <div class="cctv-item">
+                <img src="https://cctv-ss07.thb.gov.tw/T74-9K+957" alt="CCTV 1">
+                <span class="cctv-label">T74-9K+957</span>
+              </div>
+              <div class="cctv-item">
+                <img src="https://cctv-ss07.thb.gov.tw/T74-30K+132" alt="CCTV 2">
+                <span class="cctv-label">T74-30K+132</span>
+              </div>
+              <div class="cctv-item">
+                <img src="https://cctv-ss07.thb.gov.tw/T74-15K+710" alt="CCTV 3">
+                <span class="cctv-label">T74-15K+710</span>
+              </div>
+              <div class="cctv-item">
+                <img src="https://cctv-ss02.thb.gov.tw/T74-38K+167" alt="CCTV 4">
+                <span class="cctv-label">T74-38K+167</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中央區域 -->
+      <div class="center-panel">
+        <!-- 影響範圍區塊 -->
+        <div class="impact-area-section">
+          <h3 class="main-title">影響範圍</h3>
+          <div class="map-container">
+            <app-map [affectedArea]="affectedArea"></app-map>
+          </div>
+        </div>
+
+        <!-- 交通流量圖表 -->
+        <div class="traffic-flow-section">
+          <h3>主要幹道近3小時車速</h3>
+          <div class="chart-container">
+            <app-traffic-flow [data]="trafficFlow"></app-traffic-flow>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右側面板 -->
+      <div class="right-panel">
+        <!-- 事故處理進度 -->
+        <div class="progress-section">
+          <div class="section-header">
+            <h3>事故處理進度</h3>
+            <div class="last-update">
+              <i class="fas fa-clock"></i>
+              最新更新時間(第一線回報): {{ lastUpdateTime | date:'yyyy-MM-dd HH:mm' }}
+            </div>
+          </div>
+          <div class="order-status">
+            <div class="order-status-timeline">
+              <div class="order-status-timeline-completion c4"></div>
+            </div>
+            <div class="image-order-status active">
+              <div class="icon">
+                <i class="fas fa-bullhorn"></i>
+              </div>
+              <span class="status">民眾通報</span>
+            </div>
+            <div class="image-order-status active">
+              <div class="icon">
+                <i class="fas fa-user-shield"></i>
+              </div>
+              <span class="status">應變人員到場</span>
+            </div>
+            <div class="image-order-status active">
+              <div class="icon">
+                <i class="fas fa-tools"></i>
+              </div>
+              <span class="status">現場處理</span>
+            </div>
+            <div class="image-order-status active">
+              <div class="icon">
+                <i class="fas fa-ambulance"></i>
+              </div>
+              <span class="status">傷者送醫</span>
+            </div>
+            <div class="image-order-status">
+              <div class="icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <span class="status">處理完畢</span>
+            </div>
+            <div class="image-order-status">
+              <div class="icon">
+                <i class="fas fa-road"></i>
+              </div>
+              <span class="status">交通恢復</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 應變措施建議 -->
+        <div class="suggestions-section">
+          <h3>
+            <i class="fas fa-lightbulb"></i>
+            應變措施建議
+          </h3>
+          <div class="suggestion-cards">
+            <div class="suggestion-card">
+              <h4>
+                <i class="fas fa-route"></i>
+                用路人改道建議
+              </h4>
+              <p>目前台74線松竹段嚴重壅塞，建議東向駕駛提前改道至「台1線（避免進入事故區）」或松竹路或環中路，銜接其他省道</p>
+            </div>
+            <div class="suggestion-card">
+              <h4>
+                <i class="fas fa-sign"></i>
+                CMS設定建議
+              </h4>
+              <p>建議於事故前兩個交流道（潭子、崇德）CMS，顯示「台74松竹事故，預計50分恢復，請提前改道」</p>
+            </div>
+            <div class="suggestion-card news">
+              <h4>
+                <i class="fas fa-newspaper"></i>
+                新聞輿情彙整
+              </h4>
+              <div class="news-content">
+                <h5>路況險峻與安全疑慮</h5>
+                <p>多家媒體報導指出，蘇花公路由於地形險峻、路邊山崖陡峭，屢次發生坍方與事故，稱其為「死亡公路」，強調這條路段的安全隱患亟待改善。</p>
+                <h5>事故嚴重性與人命損失</h5>
+                <p>新聞詳細報導了事故造成6人死亡、39人受傷的慘烈情形，引發社會對大型遊覽車行駛於如此高風險路段的疑問，同時也引起民眾對於遇難者家屬的同情與憤慨。</p>
+                <h5>政府與運安機關的應對措施</h5>
+                <p>報導中提到國家運輸安全調查委員會已將此案列為一級公路事故進行介入調查，並呼籲相關單位加速改善路段安全，包括增設早期警示系統與提升路面維護頻率。</p>
+                <h5>民間與社群輿論的批評與呼籲</h5>
+                <p>社群媒體上，網友批評政府長期未能徹底解決蘇花公路的安全問題，呼籲相關部門盡速落實防災工程和安全改造，避免類似悲劇重演。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

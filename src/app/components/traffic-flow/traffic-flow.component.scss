@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+::ng-deep {
+  .highcharts-background {
+    height: 200px !important;  // 確保背景高度正確
+  }
+
+  .highcharts-container {
+    overflow: visible !important;  // 允許內容溢出，以顯示軸標籤
+  }
+
+  .highcharts-xaxis-labels {
+    transform: translateY(0) !important;  // 確保 x 軸標籤不會被推到容器外
+  }
+} 
