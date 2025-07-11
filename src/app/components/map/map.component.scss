@@ -1,166 +1,156 @@
-.map-container {
+:host {
+  display: block;
+  height: 100%;
   width: 100%;
-  position: relative;
-  margin-bottom: 5px;
+}
+
+.map-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 255, 176, 0.2);
 }
 
 #map {
-  height: 250px;
+  height: 100%;
   width: 100%;
-  border-radius: 8px;
-  margin-bottom: 0;
 }
 
-.map-controls {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 5px 10px;
-  border-radius: 4px;
+// 時間軸樣式
+.timeline-container {
   display: flex;
   align-items: center;
-  gap: 10px;
-  z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-
-  .time-label {
-    font-size: 22px;
-    font-weight: bold;
-    color: #333;
-  }
-
-  #play-button {
-    padding: 5px 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
-
-    &:hover {
-      background-color: #45a049;
-    }
-  }
-}
-
-.map-legend {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  padding: 15px;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: #18222e;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-top: 10px;
+  box-shadow: 0 2px 12px rgba(0, 255, 176, 0.2);
+}
 
-  .legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    .color-indicator {
-      width: 20px;
-      height: 4px;
-      margin-right: 8px;
-      border-radius: 2px;
-    }
-
-    &.smooth .color-indicator {
-      background-color: #4CAF50;
-    }
-
-    &.moderate .color-indicator {
-      background-color: #FFC107;
-    }
-
-    &.congested .color-indicator {
-      background-color: #F44336;
-    }
-
-    .legend-text {
-      color: #333;
-      font-size: 14px;
-    }
+.play-button {
+  background-color: #1a2633;
+  color: #00FFB0;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 255, 176, 0.2);
+  
+  &:hover {
+    background-color: #00FFB0;
+    color: #101820;
+  }
+  
+  i {
+    font-size: 16px;
   }
 }
 
-#timeline-container {
-  width: 100%;
-  background-color: #f5f5f5;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  position: relative;
-  z-index: 900;
-}
-
-.timeline-slider {
-  width: calc(100% - 16px);
-  margin: 5px 8px;
-  height: 8px;
-  -webkit-appearance: none;
-  background: transparent;
-
-  &::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: calc(25% - 8px);
-    height: 16px;
-    background: #4CAF50;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: -4px;
-  }
-
-  &::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 8px;
-    background: #ddd;
-    border-radius: 4px;
-  }
-
-  &::-moz-range-thumb {
-    width: calc(25% - 8px);
-    height: 16px;
-    background: #4CAF50;
-    border-radius: 4px;
-    cursor: pointer;
-    border: none;
-  }
-
-  &::-moz-range-track {
-    width: 100%;
-    height: 8px;
-    background: #ddd;
-    border-radius: 4px;
-  }
-}
-
-.timeline-ticks {
+.time-slider {
+  flex: 1;
   display: flex;
   justify-content: space-between;
-  margin: 0 8px;
-  padding-top: 5px;
+  
+  .time-point {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    background-color: #1a2633;
+    color: #adb5bd;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-right: 1px solid #101820;
+    
+    &:first-child {
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+    
+    &:last-child {
+      border-right: none;
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+    
+    &.active {
+      background-color: #00FFB0;
+      color: #101820;
+      font-weight: bold;
+    }
+    
+    &:hover:not(.active) {
+      background-color: #253545;
+      color: #E0FFF7;
+    }
+  }
 }
 
-.timeline-tick {
-  text-align: center;
-  font-size: 16px;
-  flex: 1;
-  position: relative;
+// 自定義地圖控制項樣式
+:host ::ng-deep {
+  .leaflet-control-zoom {
+    border: none;
+    
+    a {
+      background-color: #18222e;
+      color: #00FFB0;
+      border: 1px solid #00FFB0;
+      
+      &:hover {
+        background-color: #00FFB0;
+        color: #101820;
+      }
+    }
+  }
   
-  &::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 6px;
-    background: #999;
+  .leaflet-control-attribution {
+    background-color: rgba(24, 34, 46, 0.7);
+    color: #adb5bd;
+    
+    a {
+      color: #00FFB0;
+    }
+  }
+}
+
+// 自定義彈出視窗樣式
+:host ::ng-deep {
+  .leaflet-popup-content-wrapper {
+    background-color: #18222e;
+    color: #E0FFF7;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 255, 176, 0.2);
+  }
+  
+  .leaflet-popup-tip {
+    background-color: #18222e;
+  }
+  
+  .leaflet-popup-close-button {
+    color: #00FFB0;
+    
+    &:hover {
+      color: #FF3333;
+    }
+  }
+}
+
+// 自定義工具提示樣式
+:host ::ng-deep {
+  .leaflet-tooltip {
+    background-color: #18222e;
+    color: #E0FFF7;
+    border: 1px solid #00FFB0;
+    box-shadow: 0 2px 12px rgba(0, 255, 176, 0.2);
+    
+    &::before {
+      border-top-color: #00FFB0;
+    }
   }
 } 

@@ -1,16 +1,18 @@
 <div class="map-container">
   <div id="map"></div>
-  <div class="map-controls">
-    <div class="time-label">目前顯示: {{ currentTimeLabel }}</div>
-    <div class="play-control">
-      <button id="play-button" (click)="togglePlay()">{{ isPlaying ? '暫停' : '繼續' }}</button>
-    </div>
-  </div>
 </div>
 
-<div id="timeline-container">
-  <input type="range" min="0" max="3" value="0" step="1" id="time-slider" class="timeline-slider" [(ngModel)]="currentTimeIndex" (input)="onTimeSliderChange()">
-  <div class="timeline-ticks">
-    <div class="timeline-tick" *ngFor="let time of timePoints">{{ time }}</div>
+<div class="timeline-container">
+  <button class="play-button" (click)="togglePlay()">
+    <i class="fas" [ngClass]="isPlaying ? 'fa-pause' : 'fa-play'"></i>
+  </button>
+  <div class="time-slider">
+    <div 
+      *ngFor="let time of timePoints; let i = index" 
+      class="time-point" 
+      [ngClass]="{'active': currentTimeIndex === i}"
+      (click)="currentTimeIndex = i; onTimeSliderChange()">
+      {{ time }}
+    </div>
   </div>
 </div> 

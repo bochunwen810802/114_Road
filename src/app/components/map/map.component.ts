@@ -83,8 +83,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     // 初始化地图
     this.map = L.map('map').setView([this.incidentLocation[0], this.incidentLocation[1]] as L.LatLngTuple, 15);
     
-    // 使用浅色地图样式
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    // 使用深色地图样式
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 19
@@ -98,11 +98,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     // 添加影响范围图层
     if (this.affectedArea && this.affectedArea.length > 0) {
       this.affectedAreaLayer = L.polygon(this.affectedArea, {
-        color: '#ffd700',      // 黄色边框
+        color: '#00FFB0',      // 螢光綠色邊框
         weight: 2,             // 边框宽度
         opacity: 0.8,          // 边框透明度
-        fillColor: '#ffd700',  // 黄色填充
-        fillOpacity: 0.3,      // 填充透明度
+        fillColor: '#00FFB0',  // 螢光綠色填充
+        fillOpacity: 0.2,      // 填充透明度
         dashArray: '5, 10'     // 虚线边框
       }).addTo(this.map);
     }
@@ -116,9 +116,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   
   // 根据车速返回颜色
   private getColor(speed: number): string {
-    if (speed >= 63) return '#33cc33'; // 清楚的绿色 - 順暢
-    if (speed >= 37) return '#ff9900'; // 清楚的橙色 - 車多
-    return '#ff3333'; // 清楚的红色 - 壅塞
+    if (speed >= 63) return '#00FFB0'; // 螢光綠色 - 順暢
+    if (speed >= 37) return '#FFC107'; // 黃色 - 車多
+    return '#FF3333'; // 紅色 - 壅塞
   }
   
   // 绘制道路
@@ -153,14 +153,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     
     legend.onAdd = (map: L.Map) => {
       const div = L.DomUtil.create('div', 'legend');
-      div.style.backgroundColor = 'white';
+      div.style.backgroundColor = '#18222e';
       div.style.padding = '10px';
       div.style.borderRadius = '8px';
-      div.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+      div.style.boxShadow = '0 2px 12px rgba(0, 255, 176, 0.2)';
+      div.style.color = '#E0FFF7';
       div.innerHTML = `
-        <h4 style="margin: 0 0 8px 0; color: #333;">車速</h4>
+        <h4 style="margin: 0 0 8px 0; color: #00FFB0;">車速</h4>
         <div style="display: flex; align-items: center; margin-bottom: 5px;">
-          <div style="width: 20px; height: 4px; background: #4CAF50; margin-right: 8px; border-radius: 2px;"></div>
+          <div style="width: 20px; height: 4px; background: #00FFB0; margin-right: 8px; border-radius: 2px;"></div>
           順暢 (63 km/h以上)
         </div>
         <div style="display: flex; align-items: center; margin-bottom: 5px;">
@@ -168,7 +169,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
           車多 (37-62 km/h)
         </div>
         <div style="display: flex; align-items: center;">
-          <div style="width: 20px; height: 4px; background: #F44336; margin-right: 8px; border-radius: 2px;"></div>
+          <div style="width: 20px; height: 4px; background: #FF3333; margin-right: 8px; border-radius: 2px;"></div>
           壅塞 (0-36 km/h)
         </div>
       `;

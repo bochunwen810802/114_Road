@@ -33,3 +33,34 @@ html, body {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 } 
+
+body {
+  background: #101820;
+  color: #E0FFF7;
+  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+}
+
+a, .accent, .highlight {
+  color: #00FFB0;
+}
+
+.card, .panel, .dashboard-widget {
+  background: #18222e;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px #00ffb033;
+  border: 1px solid #00ffb022;
+}
+
+input, select, textarea {
+  background: #1a2633;
+  color: #E0FFF7;
+  border: 1px solid #00ffb022;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00FFB0;
+}
+
+::-webkit-scrollbar {
+  background: #101820;
+} 
