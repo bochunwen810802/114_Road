@@ -2,10 +2,11 @@
   display: block;
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 .map-container {
-  height: 100%;
+  height: calc(100% - 60px); /* 減去時間軸的高度 */
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
@@ -26,6 +27,8 @@
   padding: 10px;
   margin-top: 10px;
   box-shadow: 0 2px 12px rgba(0, 255, 176, 0.2);
+  position: relative;
+  z-index: 1000; /* 確保時間軸在最上層 */
 }
 
 .play-button {
